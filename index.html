@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>数据驾驶舱 · 龙城·营峰天境</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%233370ff'/%3E%3Cpath d='M4 16l4-5 3 3 5-7 4 4' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+
+<!-- ===== 顶部导航 ===== -->
+<nav class="topnav">
+  <a class="brand" href="index.html">
+    <span class="brand-logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg>
+    </span>
+    <span>龙城·营峰天境<small>客户归档与跟进系统</small></span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html" class="active">驾驶舱</a>
+    <a href="report.html">报备录入</a>
+    <a href="customers.html">客户档案</a>
+    <a href="daily.html">日报表</a>
+    <a href="recordings.html">录音归档</a>
+  </div>
+  <div class="nav-right">
+    <a class="mode-pill" href="settings.html"><span class="dot"></span>只读模式</a>
+    <a class="icon-btn" href="settings.html" title="设置">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </a>
+  </div>
+</nav>
+
+<main class="page">
+  <div id="local-banner"></div>
+
+  <!-- ===== KPI 指标 ===== -->
+  <div class="kpi-grid" id="kpi-grid"></div>
+
+  <!-- ===== 趋势 + 漏斗 ===== -->
+  <div class="grid dash-wide mt16">
+    <div class="card">
+      <div class="card-head">
+        <h3>近14天数据趋势</h3>
+        <div class="head-right">
+          <span class="card-note">收集 / 转换 / 到访</span>
+        </div>
+      </div>
+      <div id="trend-chart" style="width:100%;height:280px"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>客户阶段漏斗</h3><span class="card-note right">全链路</span></div>
+      <div id="funnel-chart" style="width:100%;height:280px"></div>
+    </div>
+  </div>
+
+  <!-- ===== 擂台 ===== -->
+  <div class="grid dash-mid mt16">
+    <div class="card">
+      <div class="card-head"><h3>信息擂台</h3><span class="badge blue">收集</span></div>
+      <div id="info-podium"></div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:12px">
+        <div class="card tight"><div class="card-note mb8">今日</div><div id="info-today"></div></div>
+        <div class="card tight"><div class="card-note mb8">累计</div><div id="info-total"></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>到访擂台</h3><span class="badge green">接待</span></div>
+      <div id="visit-podium"></div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:12px">
+        <div class="card tight"><div class="card-note mb8">今日</div><div id="visit-today"></div></div>
+        <div class="card tight"><div class="card-note mb8">累计</div><div id="visit-total"></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <h3>人员战力榜</h3>
+        <div class="head-right">
+          <select class="input btn-sm" id="rank-metric" style="width:auto;padding:6px 26px 6px 10px">
+            <option value="collected">信息收集</option>
+            <option value="converted">信息转换</option>
+            <option value="visited" selected>到访接待</option>
+            <option value="forced">逼定</option>
+            <option value="deals">成交</option>
+          </select>
+        </div>
+      </div>
+      <div class="rank-list" id="rank-list"></div>
+    </div>
+  </div>
+
+  <!-- ===== 待跟进 + 高意向 ===== -->
+  <div class="grid dash-row mt16">
+    <div class="card">
+      <div class="card-head"><h3>待跟进客户</h3>
+        <a class="btn btn-sm right" href="customers.html?filter=follow">全部</a>
+      </div>
+      <div class="customer-list" id="follow-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>高意向客户（A类）</h3>
+        <a class="btn btn-sm right" href="customers.html?filter=A">全部</a>
+      </div>
+      <div class="customer-list" id="a-list"></div>
+    </div>
+  </div>
+</main>
+
+<!-- ===== 底部 Tab ===== -->
+<nav class="tabbar">
+  <a href="index.html" class="active">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h8V3H3zM13 21h8V3h-8z"/></svg>驾驶舱</a>
+  <a href="customers.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>客户</a>
+  <a href="report.html" class="add-tab">
+    <span class="add-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>录入</a>
+  <a href="daily.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>日报</a>
+  <a href="recordings.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>录音</a>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<script src="assets/js/core.js"></script>
+<script src="assets/js/dashboard.js"></script>
+</body>
+</html>
