@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>设置与部署 · 龙城·营峰天境</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%233370ff'/%3E%3Cpath d='M4 16l4-5 3 3 5-7 4 4' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="brand" href="index.html">
+    <span class="brand-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V9l7-5 7 5v12M9 21v-6h6v6"/></svg></span>
+    <span>龙城·营峰天境<small>客户归档与跟进系统</small></span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html">驾驶舱</a>
+    <a href="report.html">报备录入</a>
+    <a href="customers.html">客户档案</a>
+    <a href="daily.html">日报表</a>
+    <a href="recordings.html">录音归档</a>
+  </div>
+  <div class="nav-right">
+    <a class="mode-pill" href="settings.html"><span class="dot"></span>只读模式</a>
+  </div>
+</nav>
+
+<main class="page">
+  <div class="page-head"><h1>设置与部署</h1>
+    <div class="sub">配置 GitHub 连接后即可在手机和电脑上随时录入；访客通过链接只读查看</div></div>
+
+  <!-- 部署步骤指引 -->
+  <div class="card mb16">
+    <div class="card-head"><h3>三步上线（约5分钟）</h3></div>
+    <div class="small" style="color:var(--text-2);line-height:1.9">
+      1. 注册/登录 GitHub，打开
+      <a href="https://github.com/settings/tokens/new?scopes=repo&description=longcheng-crm" target="_blank" rel="noopener" style="color:#85a8ff;text-decoration:underline">生成令牌页面</a>，勾选 <b>repo</b>，生成并复制 <code style="background:var(--bg-soft);padding:1px 6px;border-radius:5px">ghp_...</code><br>
+      2. 把令牌填到下方并保存（只存在你自己的设备上，不会上传）<br>
+      3. 在本文件夹打开 PowerShell，运行 <code style="background:var(--bg-soft);padding:1px 6px;border-radius:5px">node deploy.js</code>，按提示完成；脚本会自动建仓库、传文件、开启 GitHub Pages<br>
+      之后把生成的 <b>https://用户名.github.io/longcheng-crm/</b> 发给同事即可，他们只能查看。
+    </div>
+  </div>
+
+  <!-- GitHub 配置 -->
+  <div class="card mb16">
+    <div class="card-head"><h3>GitHub 连接</h3>
+      <button class="btn btn-sm right" id="btn-test">测试连接</button></div>
+    <div class="form-grid two-col">
+      <div class="form-row"><label>GitHub 用户名</label><input class="input" id="gh-owner" placeholder="your-name"></div>
+      <div class="form-row"><label>仓库名</label><input class="input" id="gh-repo" value="longcheng-crm"></div>
+      <div class="form-row"><label>分支</label><input class="input" id="gh-branch" value="main"></div>
+      <div class="form-row"><label>访问令牌（Token）</label><input class="input" id="gh-token" type="password" placeholder="ghp_..."></div>
+    </div>
+    <button class="btn btn-primary btn-block" id="btn-save-cfg">保存连接配置</button>
+    <div class="field-hint mt8">令牌仅保存在当前浏览器 localStorage，用于调用 GitHub API 写入数据，网站代码和访客都无法看到它。</div>
+  </div>
+
+  <!-- 飞书集成 -->
+  <div class="card mb16">
+    <div class="card-head"><h3>飞书集成</h3></div>
+    <div class="form-row mb8"><label>飞书多维表格链接（客户录音归档与跟进管理系统）</label>
+      <input class="input" id="feishu-url" placeholder="https://xxx.feishu.cn/base/..."></div>
+    <div class="flex gap8">
+      <button class="btn btn-sm" id="btn-open-feishu">打开飞书表格</button>
+      <button class="btn btn-sm btn-primary right" id="btn-save-feishu" data-edit>保存</button>
+    </div>
+    <div class="field-hint mt8">填写后驾驶舱顶部会出现飞书入口，网站与飞书可并行使用、互为补充。</div>
+  </div>
+
+  <!-- 人员与来源 -->
+  <div class="card mb16">
+    <div class="card-head"><h3>人员角色与客户来源</h3></div>
+    <div class="form-row"><label>专员角色（每行一个）</label>
+      <textarea class="input" id="cfg-staff" style="min-height:90px"></textarea></div>
+    <div class="form-row"><label>客户来源（每行一个）</label>
+      <textarea class="input" id="cfg-sources" style="min-height:90px"></textarea></div>
+    <button class="btn btn-primary btn-block" id="btn-save-cfglist" data-edit>保存人员与来源</button>
+  </div>
+
+  <!-- 数据备份 -->
+  <div class="card mb16">
+    <div class="card-head"><h3>数据备份 / 迁移</h3></div>
+    <div class="flex gap8" style="flex-wrap:wrap">
+      <button class="btn btn-sm" id="btn-export">导出全部数据（JSON）</button>
+      <button class="btn btn-sm" id="btn-import">导入数据</button>
+      <input type="file" id="import-file" accept="application/json" class="hide">
+    </div>
+    <div class="field-hint mt8">更换设备或浏览器时，可导出备份；在新设备上导入即可恢复。</div>
+  </div>
+
+  <div class="card" id="status-card">
+    <div class="small muted" id="status-text">检测运行状态中…</div>
+  </div>
+</main>
+
+<nav class="tabbar">
+  <a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h8V3H3zM13 21h8V3h-8z"/></svg>驾驶舱</a>
+  <a href="customers.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>客户</a>
+  <a href="report.html" class="add-tab"><span class="add-circle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>录入</a>
+  <a href="daily.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>日报</a>
+  <a href="recordings.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>录音</a>
+</nav>
+
+<script src="assets/js/core.js"></script>
+<script src="assets/js/settings.js"></script>
+</body>
+</html>
