@@ -102,17 +102,30 @@
   async function submitAll() {
     if (!App.requireEditor()) return;
     const btn = App.$('#btn-submit-all');
-    btn.disabled = true; btn.textContent = '提交中…';
+    btn.disabled = true; btn.textContent = '提交中…（网络慢时会自动重试，请勿关闭）';
     let ok = 0, fail = 0;
-    for (const p of parsed) {
-      if (p.unknown) { fail++; continue; }
-      const r = await App.applyReport(p);
-      if (r.ok) ok++; else fail++;
+    try {
+      for (const p of parsed) {
+        if (p.unknown) { fail++; continue; }
+        try {
+          const r = await App.applyReport(p);
+          if (r.ok) ok++; else fail++;
+        } catch (e) {
+          fail++;
+          App.toast('「' + (p.fields.name || p.fields.code || '报备') + '」暂存本机：' + e.message, 'error');
+        }
+      }
+    } finally {
+      btn.disabled = false; btn.textContent = '确认无误，全部归档';
     }
-    App.toast(`已归档 ${ok} 条` + (fail ? `，${fail} 条失败` : ''), fail ? 'error' : 'success');
-    parsed = [];
-    App.$('#raw').value = '';
-    App.$('#preview').innerHTML = '';
+    if (fail === 0) {
+      App.toast(`已归档 ${ok} 条`, 'success');
+      parsed = [];
+      App.$('#raw').value = '';
+      App.$('#preview').innerHTML = '';
+    } else {
+      App.toast(`已归档 ${ok} 条；${fail} 条已暂存本机，网络恢复后自动同步`, ok ? 'error' : 'error');
+    }
   }
 
   /* ---------------- 手动表单 ---------------- */
