@@ -113,6 +113,7 @@
     App.ready = true;
     App.renderChrome();
     document.dispatchEvent(new CustomEvent('app:ready'));
+    App.flushPending();   // 网络恢复后自动补提交暂存的数据
   };
 
   function defaultData(key) {
@@ -143,41 +144,125 @@
   }
 
   App.githubApi = async function (path, options) {
-    const res = await fetch('https://api.github.com' + path, Object.assign({
-      headers: {
-        'Authorization': 'Bearer ' + App.cfg.token,
-        'Accept': 'application/vnd.github+json',
-        'X-GitHub-Api-Version': '2022-11-28'
+    options = options || {};
+    const tries = options.tries != null ? options.tries : 2;
+    let lastErr;
+    for (let i = 0; i <= tries; i++) {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 20000);
+      try {
+        const res = await fetch('https://api.github.com' + path, {
+          method: options.method || 'GET',
+          headers: Object.assign({
+            'Authorization': 'Bearer ' + App.cfg.token,
+            'Accept': 'application/vnd.github+json',
+            'X-GitHub-Api-Version': '2022-11-28'
+          }, options.headers),
+          body: options.body,
+          signal: ctrl.signal
+        });
+        clearTimeout(timer);
+        if (!res.ok) {
+          let msg = 'GitHub API 错误 ' + res.status;
+          try { const j = await res.json(); msg = j.message || msg; } catch (e) {}
+          const retriable = res.status === 409 || res.status === 429 || res.status >= 500;
+          if (!retriable || i === tries) throw new Error(msg);
+          lastErr = new Error(msg);
+        } else {
+          return res.status === 204 ? null : await res.json();
+        }
+      } catch (e) {
+        clearTimeout(timer);
+        if (e.name === 'AbortError') e = new Error('连接 GitHub 超时（当前网络较慢）');
+        lastErr = e;
+        if (i === tries) throw e;
       }
-    }, options));
-    if (!res.ok) {
-      let msg = 'GitHub API 错误 ' + res.status;
-      try { const j = await res.json(); msg = j.message || msg; } catch (e) {}
-      throw new Error(msg);
+      await new Promise(r => setTimeout(r, 700 * (i + 1)));
     }
-    return res.status === 204 ? null : res.json();
+    throw lastErr;
+  };
+
+  // 待同步队列：API 暂时失败时留存，网络恢复后自动补提交
+  const PENDING_KEY = 'lc_pending_sync';
+  App.queuePending = function (key, content) {
+    let q = [];
+    try { q = JSON.parse(store.get(PENDING_KEY) || '[]'); } catch (e) {}
+    q = q.filter(x => x.key !== key);
+    q.push({ key, content, ts: App.nowStr() });
+    store.set(PENDING_KEY, JSON.stringify(q));
+  };
+  App.removePending = function (key) {
+    let q = [];
+    try { q = JSON.parse(store.get(PENDING_KEY) || '[]'); } catch (e) {}
+    q = q.filter(x => x.key !== key);
+    store.set(PENDING_KEY, JSON.stringify(q));
+  };
+  App.pendingCount = function () {
+    try { return JSON.parse(store.get(PENDING_KEY) || '[]').length; } catch (e) { return 0; }
+  };
+  App.flushPending = async function () {
+    if (!App.canSaveRemote()) return;
+    let q = [];
+    try { q = JSON.parse(store.get(PENDING_KEY) || '[]'); } catch (e) { return; }
+    if (!q.length) return;
+    let flushed = 0;
+    for (const item of q.slice()) {
+      const file = FILES[item.key];
+      try {
+        let sha = null;
+        try {
+          const cur = await App.githubApi(
+            `/repos/${App.cfg.owner}/${App.cfg.repo}/contents/${file}?ref=${App.cfg.branch}`, { tries: 1 });
+          sha = cur.sha;
+        } catch (e) { /* 文件不存在 = 新建 */ }
+        await App.githubApi(`/repos/${App.cfg.owner}/${App.cfg.repo}/contents/${file}`, {
+          method: 'PUT', tries: 1,
+          body: JSON.stringify({
+            message: `sync: 补同步${item.key} ${App.nowStr()}`,
+            content: toBase64(item.content), branch: App.cfg.branch, sha
+          })
+        });
+        App.removePending(item.key);
+        flushed++;
+      } catch (e) { /* 留下次启动再试 */ }
+    }
+    if (flushed) App.toast(`网络恢复，已补同步 ${flushed} 项数据`, 'success');
   };
 
   // 保存一个数据键
   App.saveData = async function (key) {
     const obj = App.data[key];
     if (key === 'settings') obj.updatedAt = App.nowStr();
-    const path = FILES[key];
+    const file = FILES[key];
     const content = JSON.stringify(obj, null, 2);
     if (App.canSaveRemote()) {
-      let sha = null;
-      try {
-        const cur = await App.githubApi(
-          `/repos/${App.cfg.owner}/${App.cfg.repo}/contents/${path}?ref=${App.cfg.branch}`);
-        sha = cur.sha;
-      } catch (e) { /* 文件不存在 = 新建 */ }
-      await App.githubApi(`/repos/${App.cfg.owner}/${App.cfg.repo}/contents/${path}`, {
-        method: 'PUT',
-        body: JSON.stringify({
-          message: `data: 更新${key} ${App.nowStr()}`,
-          content: toBase64(content), branch: App.cfg.branch, sha
-        })
-      });
+      let done = false, lastErr;
+      for (let attempt = 0; attempt < 3 && !done; attempt++) {
+        try {
+          let sha = null;
+          try {
+            const cur = await App.githubApi(
+              `/repos/${App.cfg.owner}/${App.cfg.repo}/contents/${file}?ref=${App.cfg.branch}`, { tries: 1 });
+            sha = cur.sha;
+          } catch (e) { /* 文件不存在 = 新建 */ }
+          await App.githubApi(`/repos/${App.cfg.owner}/${App.cfg.repo}/contents/${file}`, {
+            method: 'PUT', tries: 1,
+            body: JSON.stringify({
+              message: `data: 更新${key} ${App.nowStr()}`,
+              content: toBase64(content), branch: App.cfg.branch, sha
+            })
+          });
+          done = true;
+        } catch (e) {
+          lastErr = e;
+          await new Promise(r => setTimeout(r, 800 * (attempt + 1)));
+        }
+      }
+      if (!done) {
+        App.queuePending(key, content);   // 数据留存本机，稍后自动补同步
+        throw lastErr;
+      }
+      App.removePending(key);
     } else {
       store.set(LS.localData + key, content);
     }
@@ -243,6 +328,23 @@
         pill.innerHTML = '<span class="dot"></span>只读模式';
       }
     }
+    // 待同步提示（有数据暂存本机时显示，点击立即重试）
+    const navRight = $('.nav-right');
+    let pendEl = navRight ? $('.pending-pill', navRight) : null;
+    const pc = App.pendingCount();
+    if (pc > 0 && navRight) {
+      if (!pendEl) {
+        pendEl = document.createElement('a');
+        pendEl.className = 'pending-pill';
+        pendEl.addEventListener('click', async () => {
+          pendEl.textContent = '同步中…';
+          await App.flushPending();
+          App.renderChrome();
+        });
+        navRight.insertBefore(pendEl, pill);
+      }
+      pendEl.textContent = '待同步 ' + pc;
+    } else if (pendEl) pendEl.remove();
     // 非编辑者：禁用所有 [data-edit] 元素
     if (!App.isEditor()) {
       $$('[data-edit]').forEach(el => {
