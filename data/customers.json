@@ -10,7 +10,10 @@
       "industry": "房地产/购房客户",
       "intentProduct": "大三房型（大三房114.3㎡）",
       "budget": "",
-      "tags": ["价格敏感", "决策慢"],
+      "tags": [
+        "价格敏感",
+        "决策慢"
+      ],
       "intentLevel": "B",
       "stage": "方案沟通",
       "reporter": "",
@@ -20,14 +23,90 @@
       "finalResult": "",
       "note": "示例客户，熟悉系统后可在客户详情页删除",
       "timeline": [
-        { "time": "2026-09-24 10:00", "type": "信息报备", "operator": "", "raw": "龙城·营峰天境信息报备\n信息编码：X0001\n信息来源：其他\n客户姓名：黄姐\n客户意向：大三房", "fields": { "code": "X0001", "source": "其他", "name": "黄姐", "intent": "大三房" } },
-        { "time": "2026-09-24 11:00", "type": "转换报备", "operator": "", "raw": "龙城·营峰天境信息转换报备\n信息编码：X0001\n邀约形式：电话\n邀约次数：1\n拟访时间：2026-09-24 15:00", "fields": { "code": "X0001", "inviteForm": "电话", "inviteCount": "1", "planVisitTime": "2026-09-24 15:00" } },
-        { "time": "2026-09-24 15:00", "type": "首访报备", "operator": "", "raw": "龙城·营峰天境客户首访报备\n到访编码：D0001\n客户姓名：黄姐\n客户画像：价格敏感、决策慢\n意向等级：B", "fields": { "code": "D0001", "name": "黄姐", "profile": "价格敏感、决策慢", "level": "B" } }
+        {
+          "time": "2026-09-24 10:00",
+          "type": "信息报备",
+          "operator": "",
+          "raw": "龙城·营峰天境信息报备\n信息编码：X0001\n信息来源：其他\n客户姓名：黄姐\n客户意向：大三房",
+          "fields": {
+            "code": "X0001",
+            "source": "其他",
+            "name": "黄姐",
+            "intent": "大三房"
+          }
+        },
+        {
+          "time": "2026-09-24 11:00",
+          "type": "转换报备",
+          "operator": "",
+          "raw": "龙城·营峰天境信息转换报备\n信息编码：X0001\n邀约形式：电话\n邀约次数：1\n拟访时间：2026-09-24 15:00",
+          "fields": {
+            "code": "X0001",
+            "inviteForm": "电话",
+            "inviteCount": "1",
+            "planVisitTime": "2026-09-24 15:00"
+          }
+        },
+        {
+          "time": "2026-09-24 15:00",
+          "type": "首访报备",
+          "operator": "",
+          "raw": "龙城·营峰天境客户首访报备\n到访编码：D0001\n客户姓名：黄姐\n客户画像：价格敏感、决策慢\n意向等级：B",
+          "fields": {
+            "code": "D0001",
+            "name": "黄姐",
+            "profile": "价格敏感、决策慢",
+            "level": "B"
+          }
+        }
       ],
       "painPoints": [
-        { "time": "2026-09-24 15:30", "point": "对总价敏感，希望有更多优惠", "solution": "申请特价房+老带新优惠组合", "status": "跟进中" }
+        {
+          "time": "2026-09-24 15:30",
+          "point": "对总价敏感，希望有更多优惠",
+          "solution": "申请特价房+老带新优惠组合",
+          "status": "跟进中"
+        }
       ]
+    },
+    {
+      "id": "C0002",
+      "name": "琳女士",
+      "phone": "",
+      "wechat": "已私发",
+      "source": "Y（朋友）",
+      "profession": "",
+      "industry": "",
+      "intentProduct": "住宅",
+      "budget": "",
+      "tags": [],
+      "intentLevel": "",
+      "stage": "新线索",
+      "reporter": "黄秀红",
+      "firstReportAt": "2026-09-29 22:21",
+      "visitCount": 0,
+      "lastVisitAt": "",
+      "finalResult": "",
+      "note": "",
+      "timeline": [
+        {
+          "time": "2026-09-29 22:21",
+          "type": "信息报备",
+          "operator": "黄秀红",
+          "raw": "龙城营峰天境信息报备\n信息编码：HXH0928001-001\n信息来源：Y（朋友）\n客户姓名：琳女士\n客户微信：已私发\n客户意向：住宅\n报备人员：黄秀红\n报备时间：0928 -11:24",
+          "fields": {
+            "code": "HXH0928001-001",
+            "source": "Y（朋友）",
+            "name": "琳女士",
+            "wechat": "已私发",
+            "intent": "住宅",
+            "reporter": "黄秀红",
+            "time": "0928 -11:24"
+          }
+        }
+      ],
+      "painPoints": []
     }
   ],
-  "seq": 1
+  "seq": 2
 }
