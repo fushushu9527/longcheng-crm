@@ -3,30 +3,52 @@
   let parsed = [];
   let curType = 'info';
 
-  const TYPE_BADGE = { info: 'cyan', convert: 'purple', firstVisit: 'green', revisit: 'orange' };
+  const TYPE_BADGE = { info: 'cyan', convert: 'purple', firstVisit: 'green', revisit: 'orange', internal: 'cyan' };
   const TITLES = {
     info: '龙城·营峰天境信息报备',
     convert: '龙城·营峰天境信息转换报备',
     firstVisit: '龙城·营峰天境客户首访报备',
     revisit: '龙城·营峰天境客户再访报备'
   };
-  const SAMPLE = `龙城·营峰天境信息报备
-信息编码：X0002
-信息来源：抖音
-客户姓名：李先生
-客户电话：13800001111
-客户微信：li123
-客户意向：三房户型
-报备人员：小王
-报备时间：今天 10:30
+  const INTERNAL_LABELS = {
+    code: '客户信息编码', personalSeq: '个人累计信息', projectSeq: '项目累计信息',
+    source: '客户信息来源', name: '客户姓名称呼', profile: '客户大概画像',
+    phone: '电话（表情遮挡待补全）', wechat: '微信', reportTime: '信息报备时间', reporter: '信息报备人员',
+    time: '到访时间', receiver: '接待人员', duration: '接待时长', level: '意向等级',
+    feedback: '反馈意见', count: '再次到访次数', personalVisit: '个人到访累计', projectVisit: '项目到访累计',
+    room: '成交房号', signer: '成交签单人员'
+  };
+  const SAMPLE = `龙城·营峰天境
+内部客户报备
 
-龙城·营峰天境信息转换报备
-信息编码：X0002
-邀约形式：电话
-邀约次数：2
-拟访时间：明天 14:00
-邀约人员：小王
-邀约时间：今天 16:00`;
+客户信息编码：TYG1002
+个人累计信息：004
+项目累计信息：008
+客户信息来源：客户自然到访
+客户姓名称呼：隆先生
+客户大概画像：男45岁 一家人看房
+客户联系方式：182龙城大卖7075，微信已私发
+信息报备时间：10月02日
+信息报备人员：唐毅高
+
+首次到访时间：10月02日10:00
+首次接待人员：唐毅高
+客户接待时长：2小时
+客户意向等级：A
+客户反馈意见：房产证办理是否能正常办理及办理时间
+个人到访累计：2
+项目到访累计：4
+
+再次到访时间：10月02日14:36
+再次到访次数：1
+再次接待人员：唐毅高
+客户接待时长：1.5小时
+客户意向等级：A
+客户反馈意见：考虑下这两天定房
+
+客户成交时间：
+客户成交房号：
+成交签单人员：`;
 
   document.addEventListener('app:ready', init);
 
@@ -59,7 +81,30 @@
     App.toast(`识别到 ${parsed.length} 条报备，请核对后提交`);
   }
 
+  function internalRows(obj) {
+    if (!obj) return '<div class="card-note">（无）</div>';
+    return Object.keys(obj).map(k => {
+      const v = obj[k];
+      if (v == null || v === '') return '';
+      return `<tr><td class="nowrap" style="width:42%">${INTERNAL_LABELS[k] || k}</td><td>${App.esc(String(v))}</td></tr>`;
+    }).join('');
+  }
+  function previewInternal(p) {
+    const f = p.fields, h = f.head || {};
+    const c = App.findCustomer({ code: h.code });
+    const sections = [['信息报备', f.head], ['首次到访', f.first], ['再次到访', f.revisit], ['成交', f.deal]];
+    const body = sections.map(([nm, obj]) =>
+      `<div class="mt8"><div class="card-note">${nm}</div>
+      <div class="table-wrap"><table class="data-table" style="min-width:auto"><tbody>${obj ? internalRows(obj) : '<tr><td class="card-note">（本次无）</td></tr>'}</tbody></table></div></div>`
+    ).join('');
+    return `<div class="card"><div class="card-head">
+      <span class="badge cyan">内部客户报备</span>
+      <span class="card-note right">${c ? '归属客户：' + App.esc(c.name) + '（' + App.esc(c.stage) + '）' : '未找到客户，将自动新建'}</span>
+      </div>${body}</div>`;
+  }
+
   function previewCard(p) {
+    if (p.type === 'internal') return previewInternal(p);
     if (p.unknown) {
       const opts = Object.values(App.REPORT_TYPES).map(t => `<option value="${t.key}">${t.name}</option>`).join('');
       return `<div class="card">
