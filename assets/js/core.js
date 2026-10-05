@@ -51,9 +51,16 @@
   // 把微信里的模糊时间规范化为 YYYY-MM-DD HH:mm
   App.normTime = (t, baseDate) => {
     if (!t) return App.nowStr();
-    t = t.trim().replace(/[年月]/g, '-').replace(/日/g, ' ').replace(/\s+/g, ' ');
+    t = t.trim()
+      .replace(/[年月./]/g, '-').replace(/日/g, ' ')
+      .replace(/-+/g, '-').replace(/\s+/g, ' ');
     const today = App.todayStr();
     const year = today.slice(0, 4);
+    // 形如 “0928 -11:24 / 0928-11:24”：4 位月日 + 时分
+    const q0 = t.match(/(\d{4})\s*-\s*(\d{1,2}):(\d{2})(?!\d)/);
+    if (q0 && !/^\d{4}-\d{1,2}-\d{1,2}/.test(t)) {
+      return `${year}-${q0[1].slice(0, 2)}-${q0[1].slice(2, 4)} ${App.pad(+q0[2])}:${q0[3]}`;
+    }
     if (/今天|今日/.test(t)) t = t.replace(/今天|今日/, today);
     else if (/明天|明日/.test(t)) {
       const d = new Date(); d.setDate(d.getDate() + 1);
@@ -596,13 +603,24 @@
   };
   /* === ANCHOR_STATS === */
   /* ---------------- 业务逻辑层 ---------------- */
-  function matchCustomer(fields) {
+  // 判断是否真实联系方式（排除“已私发/已加/未填写”等状态词）
+  function isRealContact(v) {
+    v = String(v == null ? '' : v).trim();
+    return !!v && !/^(已私发|已发|私发|已加|已加微信|加了|未填写|暂无|没有|无|未知|待定|-)$/.test(v);
+  }
+  App.isRealContact = isRealContact;
+
+  // opts.codeOnly：信息报备只按编码匹配（编码=报备个案唯一标识，避免同名/同状态词误合并）
+  function matchCustomer(fields, opts) {
+    opts = opts || {};
     const cs = App.data.customers.customers;
     let c = null;
     if (fields.code) c = cs.find(x => (x.timeline || []).some(e => (e.fields || {}).code === fields.code));
-    if (!c && fields.phone) c = cs.find(x => x.phone && x.phone === fields.phone);
-    if (!c && fields.wechat) c = cs.find(x => x.wechat && x.wechat === fields.wechat);
-    if (!c && fields.name) c = cs.find(x => x.name === fields.name);
+    if (!c && !opts.codeOnly) {
+      if (isRealContact(fields.phone)) c = cs.find(x => x.phone && x.phone === fields.phone);
+      if (!c && isRealContact(fields.wechat)) c = cs.find(x => x.wechat && x.wechat === fields.wechat);
+      if (!c && fields.name) c = cs.find(x => x.name === fields.name);
+    }
     return c;
   }
   App.findCustomer = matchCustomer;
@@ -628,7 +646,7 @@
   // 应用一条报备（自动建档/合并/流转）
   App.applyReport = async function (item) {
     const type = item.type, fields = item.fields || {}, raw = item.raw || '';
-    let c = matchCustomer(fields);
+    let c = matchCustomer(fields, { codeOnly: type === 'info' });
     let isNew = false;
     if (!c) {
       if (type === 'info' || type === 'firstVisit') {
