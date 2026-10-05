@@ -56,6 +56,14 @@
     <div class="field-hint mt8">令牌仅保存在当前浏览器 localStorage，用于调用 GitHub API 写入数据，网站代码和访客都无法看到它。</div>
   </div>
 
+  <!-- 待同步队列 -->
+  <div class="card mb16">
+    <div class="card-head"><h3>待同步队列</h3>
+      <button class="btn btn-sm btn-primary right" id="btn-flush" data-edit>立即同步全部</button></div>
+    <div id="pending-list" class="small">检测中…</div>
+    <div class="field-hint mt8">网络抖动时提交会暂存这里、不丢数据，并显示每条最新失败原因；仓库数据若已更新会自动跳过旧版本，避免覆盖。</div>
+  </div>
+
   <!-- 飞书集成 -->
   <div class="card mb16">
     <div class="card-head"><h3>飞书集成</h3></div>
