@@ -23,7 +23,39 @@
     App.$('#btn-import').onclick = () => App.$('#import-file').click();
     App.$('#import-file').onchange = importData;
 
+    App.$('#btn-flush').onclick = async () => {
+      const b = App.$('#btn-flush'); b.textContent = '同步中…'; b.disabled = true;
+      await App.flushPending({ manual: true });
+      b.textContent = '立即同步全部'; b.disabled = false;
+      renderPending(); renderStatus();
+    };
+    renderPending();
     renderStatus();
+  }
+
+  const PENDING_NAMES = { settings: '系统设置', customers: '客户数据', daily: '日报数据', recordings: '录音数据' };
+  function renderPending() {
+    let q = [];
+    try { q = JSON.parse(App.store.get('lc_pending_sync') || '[]'); } catch (e) {}
+    const el = App.$('#pending-list');
+    if (!q.length) { el.innerHTML = '<div class="muted">当前没有待同步数据。</div>'; return; }
+    el.innerHTML = q.map(x => `
+      <div style="border:1px solid var(--border);border-radius:10px;padding:10px;margin-bottom:8px">
+        <div><b>${PENDING_NAMES[x.key] || x.key}</b> <span class="muted">${App.esc(x.ts || '')}</span></div>
+        <div class="muted">${x.lastError ? '失败原因：' + App.esc(x.lastError) : '等待同步'}</div>
+        <div class="flex gap8" style="margin-top:6px">
+          <button class="btn btn-sm" data-pk="${x.key}">同步此项</button>
+          <button class="btn btn-sm" data-pd="${x.key}">删除</button>
+        </div>
+      </div>`).join('');
+    el.querySelectorAll('[data-pk]').forEach(b => b.onclick = async () => {
+      b.textContent = '同步中…';
+      await App.flushPending({ manual: true });
+      renderPending(); renderStatus();
+    });
+    el.querySelectorAll('[data-pd]').forEach(b => b.onclick = () => {
+      App.removePending(b.dataset.pd); renderPending(); App.renderChrome();
+    });
   }
 
   function saveCfg() {
