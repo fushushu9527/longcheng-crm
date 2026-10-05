@@ -189,14 +189,52 @@
     throw lastErr;
   };
 
+  // 统一可靠文件提交：杜绝“GET 超时被误判文件不存在 → PUT 缺 sha → 422 永久失败”
+  App.commitFile = async function (file, content, message) {
+    const owner = App.cfg.owner, repo = App.cfg.repo, branch = App.cfg.branch;
+    let lastErr;
+    for (let round = 0; round < 4; round++) {
+      // 1) 取当前 sha：只有明确 404 才视为新文件
+      let sha = null, exists = true;
+      try {
+        const cur = await App.githubApi(
+          `/repos/${owner}/${repo}/contents/${file}?ref=${branch}`, { tries: 2 });
+        sha = cur.sha;
+      } catch (e) {
+        if (/Not Found|404/i.test(e.message)) { exists = false; }
+        else { lastErr = e; await new Promise(r => setTimeout(r, 700 * (round + 1))); continue; }
+      }
+      // 2) 提交（sha 缺失/过期/冲突会在下一轮重新 GET）
+      try {
+        const payload = { message, content: toBase64(content), branch };
+        if (exists) payload.sha = sha;
+        await App.githubApi(`/repos/${owner}/${repo}/contents/${file}`, {
+          method: 'PUT', tries: 1, body: JSON.stringify(payload)
+        });
+        return true;
+      } catch (e) {
+        lastErr = e;
+        await new Promise(r => setTimeout(r, 700 * (round + 1)));
+      }
+    }
+    throw lastErr || new Error('提交失败');
+  };
+
   // 待同步队列：API 暂时失败时留存，网络恢复后自动补提交
   const PENDING_KEY = 'lc_pending_sync';
-  App.queuePending = function (key, content) {
+  App.queuePending = function (key, content, errMsg) {
     let q = [];
     try { q = JSON.parse(store.get(PENDING_KEY) || '[]'); } catch (e) {}
     q = q.filter(x => x.key !== key);
-    q.push({ key, content, ts: App.nowStr() });
+    q.push({ key, content, ts: App.nowStr(), lastError: errMsg || '' });
     store.set(PENDING_KEY, JSON.stringify(q));
+  };
+  // 记录某条待同步项的最新失败原因
+  App.markPendingError = function (key, msg) {
+    let q = [];
+    try { q = JSON.parse(store.get(PENDING_KEY) || '[]'); } catch (e) { return; }
+    const it = q.find(x => x.key === key);
+    if (it) { it.lastError = msg || ''; it.ts = App.nowStr(); store.set(PENDING_KEY, JSON.stringify(q)); }
   };
   App.removePending = function (key) {
     let q = [];
@@ -207,33 +245,57 @@
   App.pendingCount = function () {
     try { return JSON.parse(store.get(PENDING_KEY) || '[]').length; } catch (e) { return 0; }
   };
-  App.flushPending = async function () {
-    if (!App.canSaveRemote()) return;
+  // 防回滚：仓库版本若比队列快照更新（客户 seq 更大 / 录音更多），丢弃旧快照而非覆盖
+  App.pendingConflictGuard = async function (file, item) {
+    try {
+      const cur = await App.githubApi(
+        `/repos/${App.cfg.owner}/${App.cfg.repo}/contents/${file}?ref=${App.cfg.branch}`, { tries: 2 });
+      const bytes = Uint8Array.from(atob(cur.content), c => c.charCodeAt(0));
+      const repoObj = JSON.parse(new TextDecoder().decode(bytes));
+      const pendObj = JSON.parse(item.content);
+      if (file === FILES.customers)
+        return (+repoObj.seq || 0) > (+pendObj.seq || 0) || repoObj.customers.length > pendObj.customers.length;
+      if (file === FILES.recordings)
+        return (repoObj.recordings || []).length > (pendObj.recordings || []).length;
+    } catch (e) { /* 取不到不拦截，交给 commitFile */ }
+    return false;
+  };
+
+  App.flushPending = async function (opts) {
+    opts = opts || {};
+    if (!App.canSaveRemote()) {
+      if (opts.manual) App.toast('未配置 GitHub 连接，请先到设置页保存令牌', 'warn');
+      return { flushed: 0, failed: 0, errors: [] };
+    }
     let q = [];
-    try { q = JSON.parse(store.get(PENDING_KEY) || '[]'); } catch (e) { return; }
-    if (!q.length) return;
-    let flushed = 0;
+    try { q = JSON.parse(store.get(PENDING_KEY) || '[]'); } catch (e) { return { flushed: 0, failed: 0, errors: [] }; }
+    if (!q.length) {
+      if (opts.manual) App.toast('没有待同步的数据', 'success');
+      return { flushed: 0, failed: 0, errors: [] };
+    }
+    let flushed = 0, failed = 0; const errs = [];
     for (const item of q.slice()) {
       const file = FILES[item.key];
+      if (!file) { App.markPendingError(item.key, '未知数据类型'); errs.push(item.key + '：未知数据类型'); failed++; continue; }
       try {
-        let sha = null;
-        try {
-          const cur = await App.githubApi(
-            `/repos/${App.cfg.owner}/${App.cfg.repo}/contents/${file}?ref=${App.cfg.branch}`, { tries: 1 });
-          sha = cur.sha;
-        } catch (e) { /* 文件不存在 = 新建 */ }
-        await App.githubApi(`/repos/${App.cfg.owner}/${App.cfg.repo}/contents/${file}`, {
-          method: 'PUT', tries: 1,
-          body: JSON.stringify({
-            message: `sync: 补同步${item.key} ${App.nowStr()}`,
-            content: toBase64(item.content), branch: App.cfg.branch, sha
-          })
-        });
+        if (await App.pendingConflictGuard(file, item)) {
+          App.removePending(item.key);
+          errs.push(item.key + '：仓库数据已更新，自动跳过旧版本');
+          continue;
+        }
+        await App.commitFile(file, item.content, `sync: 补同步${item.key} ${App.nowStr()}`);
         App.removePending(item.key);
         flushed++;
-      } catch (e) { /* 留下次启动再试 */ }
+      } catch (e) {
+        App.markPendingError(item.key, e.message);
+        errs.push(item.key + '：' + e.message);
+        failed++;
+      }
     }
-    if (flushed) App.toast(`网络恢复，已补同步 ${flushed} 项数据`, 'success');
+    if (flushed) App.toast(`已补同步 ${flushed} 项` + (failed ? `，${failed} 项仍失败（原因见设置页）` : ''), failed ? 'warn' : 'success');
+    else if (failed) App.toast('同步失败：' + (errs[0] || '').slice(0, 40), 'warn');
+    if (typeof App.renderChrome === 'function') App.renderChrome();
+    return { flushed, failed, errors: errs };
   };
 
   // 保存一个数据键
@@ -243,33 +305,13 @@
     const file = FILES[key];
     const content = JSON.stringify(obj, null, 2);
     if (App.canSaveRemote()) {
-      let done = false, lastErr;
-      for (let attempt = 0; attempt < 3 && !done; attempt++) {
-        try {
-          let sha = null;
-          try {
-            const cur = await App.githubApi(
-              `/repos/${App.cfg.owner}/${App.cfg.repo}/contents/${file}?ref=${App.cfg.branch}`, { tries: 1 });
-            sha = cur.sha;
-          } catch (e) { /* 文件不存在 = 新建 */ }
-          await App.githubApi(`/repos/${App.cfg.owner}/${App.cfg.repo}/contents/${file}`, {
-            method: 'PUT', tries: 1,
-            body: JSON.stringify({
-              message: `data: 更新${key} ${App.nowStr()}`,
-              content: toBase64(content), branch: App.cfg.branch, sha
-            })
-          });
-          done = true;
-        } catch (e) {
-          lastErr = e;
-          await new Promise(r => setTimeout(r, 800 * (attempt + 1)));
-        }
+      try {
+        await App.commitFile(file, content, `data: 更新${key} ${App.nowStr()}`);
+        App.removePending(key);
+      } catch (e) {
+        App.queuePending(key, content, e.message);   // 数据留存本机，稍后自动补同步
+        throw e;
       }
-      if (!done) {
-        App.queuePending(key, content);   // 数据留存本机，稍后自动补同步
-        throw lastErr;
-      }
-      App.removePending(key);
     } else {
       store.set(LS.localData + key, content);
     }
@@ -344,8 +386,11 @@
         pendEl = document.createElement('a');
         pendEl.className = 'pending-pill';
         pendEl.addEventListener('click', async () => {
+          if (pendEl.dataset.busy === '1') return;
+          pendEl.dataset.busy = '1';
           pendEl.textContent = '同步中…';
-          await App.flushPending();
+          await App.flushPending({ manual: true });
+          pendEl.dataset.busy = '';
           App.renderChrome();
         });
         navRight.insertBefore(pendEl, pill);
@@ -427,11 +472,16 @@
         ['operator', ['接待人员']], ['intent', ['客户意向']], ['levelChange', ['等级变化']],
         ['finalResult', ['最终结果']]
       ]
+    },
+    // 一体化报备：一条含 信息+首访+再访+成交，走专门的 parseInternal
+    internal: {
+      key: 'internal', name: '内部客户报备',
+      re: [/内部客户报备/], not: [], fields: []
     }
   };
   App.REPORT_TYPES = REPORT_TYPES;
 
-  const TYPE_ORDER = ['convert', 'firstVisit', 'revisit', 'info'];
+  const TYPE_ORDER = ['internal', 'convert', 'firstVisit', 'revisit', 'info'];
 
   function detectType(title) {
     for (const k of TYPE_ORDER) {
@@ -447,6 +497,7 @@
     const title = lines[0];
     const type = forceType || detectType(title);
     if (!type) return { unknown: true, title, raw: block };
+    if (type === 'internal') return parseInternal(block);
     const def = REPORT_TYPES[type];
     const fields = {};
     for (const line of lines.slice(1)) {
@@ -464,6 +515,73 @@
     return { type, title, fields, raw: block };
   }
 
+  // 拆分联系方式：“182龙城大卖7075，微信已私发” → phone/wechat（表情遮挡仅留数字，待补全）
+  function splitContact(v) {
+    const out = {};
+    const parts = String(v).split(/[,，;；]/);
+    const wxPart = parts.find(x => /微信/.test(x));
+    if (wxPart) {
+      const tail = wxPart.split('微信').pop().trim();
+      out.wechat = /已私发|私发|已发/.test(tail) ? '已私发' : (tail || '已私发');
+    }
+    const digits = String(v).replace(/微信[^,，;；]*/g, '').replace(/\D/g, '');
+    if (digits) out.phone = digits;
+    return out;
+  }
+
+  // 解析一体化「内部客户报备」：头部信息 + 首次到访 + 再次到访 + 成交
+  function parseInternal(block) {
+    const lines = block.split(/\r?\n/);
+    const head = {}, zones = { first: null, revisit: null, deal: null };
+    let zone = 'head', cur = head;
+    const kv = line => {
+      const t = line.trim();
+      const i = t.search(/[：:]/);
+      if (i < 0) return null;
+      return [t.slice(0, i).trim(), t.slice(i + 1).replace(/^[：:]\s*/, '').trim()];
+    };
+    for (const line of lines) {
+      const t = line.trim();
+      if (/首次到访时间/.test(t)) { zone = 'first'; zones.first = {}; cur = zones.first; }
+      else if (/再次到访时间/.test(t)) { zone = 'revisit'; zones.revisit = {}; cur = zones.revisit; }
+      else if (/客户成交时间/.test(t)) { zone = 'deal'; zones.deal = {}; cur = zones.deal; }
+      const p = kv(line);
+      if (!p || !p[1]) continue;
+      const label = p[0], v = p[1];
+      if (zone === 'head') {
+        if (/信息编码/.test(label)) head.code = v;
+        else if (/个人累计信息/.test(label)) head.personalSeq = v;
+        else if (/项目累计信息/.test(label)) head.projectSeq = v;
+        else if (/信息来源/.test(label)) head.source = v;
+        else if (/姓名称呼|姓名/.test(label)) head.name = v;
+        else if (/大概画像|画像/.test(label)) head.profile = v;
+        else if (/联系方式/.test(label)) Object.assign(head, splitContact(v));
+        else if (/报备时间/.test(label)) head.reportTime = v;
+        else if (/报备人员/.test(label)) head.reporter = v;
+      } else if (zone === 'first') {
+        if (/首次到访时间/.test(label)) cur.time = v;
+        else if (/首次接待人员/.test(label)) cur.receiver = v;
+        else if (/接待时长/.test(label)) cur.duration = v;
+        else if (/意向等级/.test(label)) cur.level = v;
+        else if (/反馈意见/.test(label)) cur.feedback = v;
+        else if (/个人到访累计/.test(label)) cur.personalVisit = v;
+        else if (/项目到访累计/.test(label)) cur.projectVisit = v;
+      } else if (zone === 'revisit') {
+        if (/再次到访时间/.test(label)) cur.time = v;
+        else if (/再次到访次数/.test(label)) cur.count = v;
+        else if (/再次接待人员/.test(label)) cur.receiver = v;
+        else if (/接待时长/.test(label)) cur.duration = v;
+        else if (/意向等级/.test(label)) cur.level = v;
+        else if (/反馈意见/.test(label)) cur.feedback = v;
+      } else if (zone === 'deal') {
+        if (/成交时间/.test(label)) cur.time = v;
+        else if (/成交房号/.test(label)) cur.room = v;
+        else if (/签单人员/.test(label)) cur.signer = v;
+      }
+    }
+    return { type: 'internal', title: '内部客户报备', fields: { head, first: zones.first, revisit: zones.revisit, deal: zones.deal }, raw: block };
+  }
+
   // 解析整段粘贴文本，可能含多条报备
   App.parseWechat = function (text) {
     const lines = text.split(/\r?\n/);
@@ -471,7 +589,8 @@
     let cur = [];
     for (const line of lines) {
       const t = line.trim();
-      if (t && detectType(t)) {
+      // 新块标题不含冒号；含冒号的是字段行（如“信息报备时间：”），不得误判为新块
+      if (t && !/[：:]/.test(t) && detectType(t)) {
         if (cur.length) blocks.push(cur.join('\n'));
         cur = [line];
       } else if (cur.length) cur.push(line);
@@ -646,6 +765,7 @@
   // 应用一条报备（自动建档/合并/流转）
   App.applyReport = async function (item) {
     const type = item.type, fields = item.fields || {}, raw = item.raw || '';
+    if (type === 'internal') return await App.applyInternal(item);
     let c = matchCustomer(fields, { codeOnly: type === 'info' });
     let isNew = false;
     if (!c) {
@@ -690,6 +810,58 @@
         if (/成交|认购|签约/.test(fields.finalResult)) c.stage = '已成交';
         else if (/放弃|流失|不考虑|无意向/.test(fields.finalResult)) c.stage = '已流失';
       }
+    }
+    await App.saveData('customers');
+    return { ok: true, isNew, customer: c };
+  };
+
+  // 应用一体化内部报备：一条消息按区块落成多个阶段事件
+  App.applyInternal = async function (item) {
+    const f = item.fields || {}, h = f.head || {};
+    if (!h.code) return { ok: false, msg: '缺少客户信息编码' };
+    let c = matchCustomer({ code: h.code }, { codeOnly: true });
+    let isNew = false;
+    if (!c) {
+      c = App.newCustomer({ name: h.name, phone: h.phone, wechat: h.wechat, source: h.source, reporter: h.reporter, profile: h.profile });
+      isNew = true;
+      App.data.customers.customers.push(c);
+    }
+    const headTime = App.normTime(h.reportTime);
+    c.timeline.push({
+      time: headTime, type: '信息报备', operator: h.reporter || '', raw: item.raw,
+      fields: { code: h.code, source: h.source, name: h.name, phone: h.phone, wechat: h.wechat, intent: '住宅', reporter: h.reporter, time: h.reportTime, personalSeq: h.personalSeq, projectSeq: h.projectSeq }
+    });
+    if (h.name) c.name = h.name;
+    if (h.phone) c.phone = h.phone;
+    if (h.wechat) c.wechat = h.wechat;
+    if (h.source) c.source = h.source;
+    if (h.profile) App.mergeTags(c, App.splitTags(h.profile));
+    if (h.reporter && !c.reporter) c.reporter = h.reporter;
+    if (!c.firstReportAt) c.firstReportAt = headTime;
+    if (f.first) {
+      const x = f.first, t = App.normTime(x.time);
+      c.timeline.push({ time: t, type: '首访报备', operator: x.receiver || '', raw: item.raw, fields: { code: h.code, name: h.name, time: x.time, receiver: x.receiver, level: x.level, profile: h.profile, duration: x.duration, feedback: x.feedback } });
+      c.visitCount = Math.max(c.visitCount, 1);
+      c.lastVisitAt = t;
+      if (x.level) c.intentLevel = x.level.toUpperCase();
+      if (['新线索', '已邀约', ''].includes(c.stage)) c.stage = '方案沟通';
+      if (x.feedback) c.painPoints.push({ time: t, point: x.feedback, solution: '', status: '跟进中' });
+    }
+    if (f.revisit) {
+      const x = f.revisit, t = App.normTime(x.time);
+      const add = parseInt(x.count) || 1;
+      c.timeline.push({ time: t, type: '再访报备', operator: x.receiver || '', raw: item.raw, fields: { code: h.code, time: x.time, operator: x.reporter, visitCount: x.count, levelChange: x.level, finalResult: x.feedback, duration: x.duration } });
+      c.visitCount = Math.max(c.visitCount, c.visitCount + add);
+      c.lastVisitAt = t;
+      if (x.level) c.intentLevel = x.level.toUpperCase();
+      if (!/成交|流失/.test(c.stage)) c.stage = '再访跟进';
+      if (x.feedback) { c.finalResult = x.feedback; c.painPoints.push({ time: t, point: x.feedback, solution: '', status: '跟进中' }); }
+    }
+    if (f.deal && f.deal.time) {
+      const x = f.deal, t = App.normTime(x.time);
+      c.timeline.push({ time: t, type: '成交', operator: x.signer || '', raw: item.raw, fields: { room: x.room, signer: x.signer } });
+      c.stage = '已成交';
+      c.finalResult = '已成交' + (x.room ? '，房号' + x.room : '');
     }
     await App.saveData('customers');
     return { ok: true, isNew, customer: c };
