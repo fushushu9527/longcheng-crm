@@ -12,7 +12,7 @@
       "budget": "",
       "tags": [],
       "intentLevel": "",
-      "stage": "新线索",
+      "stage": "已邀约",
       "reporter": "黄秀红",
       "firstReportAt": "2026-10-06 09:32",
       "visitCount": 0,
@@ -33,6 +33,20 @@
             "intent": "住宅",
             "reporter": "黄秀红",
             "time": "0928 -11：24"
+          }
+        },
+        {
+          "time": "2026-09-18 09:00",
+          "type": "转换报备",
+          "operator": "琳女士",
+          "raw": "龙城·誉峰天境信息转换报备\n信息编码：HXH0928001-001\n邀约形式：微信邀约\n邀约次数：1\n拟访时间：2026.9.19\n邀约人员：琳女士\n邀约时间:2026.9.18",
+          "fields": {
+            "code": "HXH0928001-001",
+            "inviteForm": "微信邀约",
+            "inviteCount": "1",
+            "planVisitTime": "2026.9.19",
+            "operator": "琳女士",
+            "time": "2026.9.18"
           }
         }
       ],
