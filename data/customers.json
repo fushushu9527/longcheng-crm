@@ -78,6 +78,15 @@
             "levelChange": "B",
             "finalResult": "等价格出来再决定"
           }
+        },
+        {
+          "time": "2026-10-06 09:55",
+          "type": "沟通记录",
+          "operator": "",
+          "raw": "录音：琳女士的沟通录音",
+          "fields": {
+            "recordingUrl": "https://my.feishu.cn/file/L5tWbuh36oHuajxp7PtcbaADnhr"
+          }
         }
       ],
       "painPoints": []
