@@ -297,21 +297,24 @@
     },
     {
       "id": "C0016",
-      "name": "黄姐",
-      "phone": "",
-      "wechat": "已私发",
-      "source": "上门到访",
+      "name": "同信息报备一致",
+      "phone": "同信息报备一致",
+      "wechat": "同信息报备一致",
+      "source": "同信息报备一致",
       "profession": "",
       "industry": "",
-      "intentProduct": "住宅",
+      "intentProduct": "住房",
       "budget": "",
-      "tags": [],
-      "intentLevel": "",
-      "stage": "新线索",
+      "tags": [
+        "40岁左右",
+        "给弟弟买房"
+      ],
+      "intentLevel": "B",
+      "stage": "方案沟通",
       "reporter": "唐毅高",
       "firstReportAt": "2026-10-06 09:46",
-      "visitCount": 0,
-      "lastVisitAt": "",
+      "visitCount": 1,
+      "lastVisitAt": "2026-09-23 09:00",
       "finalResult": "",
       "note": "",
       "timeline": [
@@ -328,6 +331,24 @@
             "intent": "住宅",
             "reporter": "唐毅高",
             "time": "0928 -11：35"
+          }
+        },
+        {
+          "time": "2026-09-23 09:00",
+          "type": "首访报备",
+          "operator": "唐毅高",
+          "raw": "龙城·誉峰天境客户首访报备\n到访编码：TYG0928003-006\n信息来源：同信息报备一致\n客户姓名:   同信息报备一致\n客户电话：同信息报备一致\n客户微信：同信息报备一致\n首访时间：09.23\n客户职业：\n客户画像：40岁左右，给弟弟买房\n客户意向：住房\n意向等级：B\n首防接待：唐毅高",
+          "fields": {
+            "code": "TYG0928003-006",
+            "source": "同信息报备一致",
+            "name": "同信息报备一致",
+            "phone": "同信息报备一致",
+            "wechat": "同信息报备一致",
+            "time": "09.23",
+            "profile": "40岁左右，给弟弟买房",
+            "intent": "住房",
+            "level": "B",
+            "receiver": "唐毅高"
           }
         }
       ],
