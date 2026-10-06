@@ -75,61 +75,6 @@
         }
       ],
       "painPoints": []
-    },
-    {
-      "id": "C0007",
-      "name": "黄姐",
-      "phone": "",
-      "wechat": "已私发",
-      "source": "上门到访",
-      "profession": "",
-      "industry": "",
-      "intentProduct": "住宅",
-      "budget": "",
-      "tags": [
-        "40岁左右",
-        "给弟弟买房"
-      ],
-      "intentLevel": "B",
-      "stage": "方案沟通",
-      "reporter": "唐毅高",
-      "firstReportAt": "2026-09-29 22:43",
-      "visitCount": 1,
-      "lastVisitAt": "2026-09-23 09:00",
-      "finalResult": "",
-      "note": "",
-      "timeline": [
-        {
-          "time": "2026-09-28 11:35",
-          "type": "信息报备",
-          "operator": "唐毅高",
-          "raw": "",
-          "fields": {
-            "code": "TYG0928003-006",
-            "source": "上门到访",
-            "name": "黄姐",
-            "wechat": "已私发",
-            "intent": "住宅",
-            "reporter": "唐毅高",
-            "time": "0928 -11:35"
-          }
-        },
-        {
-          "time": "2026-09-23 09:00",
-          "type": "首访报备",
-          "operator": "唐毅高",
-          "raw": "龙城·营峰天境客户首访报备\n到访编码：TYG0928003-002（系统修改，原 TYG0928003-006）\n信息来源：同信息报备一致\n客户姓名：同信息报备一致\n首访时间：09.23\n客户画像：40岁左右，给弟弟买房\n意向等级：B\n首访接待：唐毅高",
-          "fields": {
-            "code": "TYG0928003-006",
-            "time": "09.23",
-            "profile": "40岁左右，给弟弟买房",
-            "intent": "住宅",
-            "level": "B",
-            "receiver": "唐毅高"
-          }
-        }
-      ],
-      "painPoints": []
     }
   ],
   "seq": 10
