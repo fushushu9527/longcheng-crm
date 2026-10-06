@@ -1,6 +1,15 @@
 {
   "recordings": [
     {
+      "id": "R1791252629134",
+      "customerId": "C0021",
+      "customerName": "李先生",
+      "name": "李先生的沟通录音",
+      "url": "https://my.feishu.cn/file/WB70bs30NofEhgxWVaUcUXFKnie",
+      "summary": "",
+      "createdAt": "2026-10-06 10:10"
+    },
+    {
       "id": "R1791252232802",
       "customerId": "C0019",
       "customerName": "隆先生",
