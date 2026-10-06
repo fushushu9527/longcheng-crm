@@ -1,3 +1,13 @@
 {
-  "recordings": []
+  "recordings": [
+    {
+      "id": "R1791251751681",
+      "customerId": "C0011",
+      "customerName": "琳女士",
+      "name": "琳女士的沟通录音",
+      "url": "https://my.feishu.cn/file/L5tWbuh36oHuajxp7PtcbaADnhr",
+      "summary": "",
+      "createdAt": "2026-10-06 09:55"
+    }
+  ]
 }
