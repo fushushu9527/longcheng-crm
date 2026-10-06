@@ -37,44 +37,6 @@
         }
       ],
       "painPoints": []
-    },
-    {
-      "id": "C0006",
-      "name": "卢姐",
-      "phone": "",
-      "wechat": "已私发",
-      "source": "上门到访",
-      "profession": "",
-      "industry": "",
-      "intentProduct": "住宅",
-      "budget": "",
-      "tags": [],
-      "intentLevel": "",
-      "stage": "新线索",
-      "reporter": "唐毅高",
-      "firstReportAt": "2026-09-29 22:43",
-      "visitCount": 0,
-      "lastVisitAt": "",
-      "finalResult": "",
-      "note": "",
-      "timeline": [
-        {
-          "time": "2026-09-28 11:33",
-          "type": "信息报备",
-          "operator": "唐毅高",
-          "raw": "",
-          "fields": {
-            "code": "TYG0928002-005",
-            "source": "上门到访",
-            "name": "卢姐",
-            "wechat": "已私发",
-            "intent": "住宅",
-            "reporter": "唐毅高",
-            "time": "0928 -11:33"
-          }
-        }
-      ],
-      "painPoints": []
     }
   ],
   "seq": 10
