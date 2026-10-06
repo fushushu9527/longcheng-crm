@@ -10,13 +10,16 @@
       "industry": "",
       "intentProduct": "住宅",
       "budget": "",
-      "tags": [],
-      "intentLevel": "",
-      "stage": "已邀约",
+      "tags": [
+        "女",
+        "50岁"
+      ],
+      "intentLevel": "C",
+      "stage": "方案沟通",
       "reporter": "黄秀红",
       "firstReportAt": "2026-10-06 09:32",
-      "visitCount": 0,
-      "lastVisitAt": "",
+      "visitCount": 1,
+      "lastVisitAt": "2026-09-19 09:00",
       "finalResult": "",
       "note": "",
       "timeline": [
@@ -47,6 +50,23 @@
             "planVisitTime": "2026.9.19",
             "operator": "琳女士",
             "time": "2026.9.18"
+          }
+        },
+        {
+          "time": "2026-09-19 09:00",
+          "type": "首访报备",
+          "operator": "黄秀红",
+          "raw": "龙城·誉峰天境客户首访报备\n到访编码：HXH0928001-001\n信息来源：Y（朋友）\n客户姓名:琳女士\n客户电话：\n客户微信：已私发\n首访时间：2026.9.19\n客户职业：\n客户画像：女，50岁\n客户意向：住宅\n意向等级：C\n首防接待：黄秀红",
+          "fields": {
+            "code": "HXH0928001-001",
+            "source": "Y（朋友）",
+            "name": "琳女士",
+            "wechat": "已私发",
+            "time": "2026.9.19",
+            "profile": "女，50岁",
+            "intent": "住宅",
+            "level": "C",
+            "receiver": "黄秀红"
           }
         }
       ],
