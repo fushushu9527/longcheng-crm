@@ -227,7 +227,45 @@
         }
       ],
       "painPoints": []
+    },
+    {
+      "id": "C0015",
+      "name": "黄姐",
+      "phone": "",
+      "wechat": "已私发",
+      "source": "上门到访",
+      "profession": "",
+      "industry": "",
+      "intentProduct": "住宅",
+      "budget": "",
+      "tags": [],
+      "intentLevel": "",
+      "stage": "新线索",
+      "reporter": "唐毅高",
+      "firstReportAt": "2026-10-06 09:43",
+      "visitCount": 0,
+      "lastVisitAt": "",
+      "finalResult": "",
+      "note": "",
+      "timeline": [
+        {
+          "time": "2026-10-06 09:43",
+          "type": "信息报备",
+          "operator": "唐毅高",
+          "raw": "龙城·誉峰天境信息报备\n信息编码：TYG0928001-004\n信息来源：上门到访\n客户姓名：黄姐\n客户电话：\n客户微信：已私发\n客户意向：住宅\n报备人员：唐毅高\n报备时间：0928 -11：33",
+          "fields": {
+            "code": "TYG0928001-004",
+            "source": "上门到访",
+            "name": "黄姐",
+            "wechat": "已私发",
+            "intent": "住宅",
+            "reporter": "唐毅高",
+            "time": "0928 -11：33"
+          }
+        }
+      ],
+      "painPoints": []
     }
   ],
-  "seq": 14
+  "seq": 15
 }
