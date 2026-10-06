@@ -78,15 +78,6 @@
             "levelChange": "B",
             "finalResult": "等价格出来再决定"
           }
-        },
-        {
-          "time": "2026-10-06 09:55",
-          "type": "沟通记录",
-          "operator": "",
-          "raw": "录音：琳女士的沟通录音",
-          "fields": {
-            "recordingUrl": "https://my.feishu.cn/file/L5tWbuh36oHuajxp7PtcbaADnhr"
-          }
         }
       ],
       "painPoints": []
@@ -377,7 +368,45 @@
         }
       ],
       "painPoints": []
+    },
+    {
+      "id": "C0017",
+      "name": "覃女士",
+      "phone": "",
+      "wechat": "已私发",
+      "source": "y（朋友）",
+      "profession": "",
+      "industry": "",
+      "intentProduct": "住宅",
+      "budget": "",
+      "tags": [],
+      "intentLevel": "",
+      "stage": "新线索",
+      "reporter": "农彩凤",
+      "firstReportAt": "2026-10-06 09:56",
+      "visitCount": 0,
+      "lastVisitAt": "",
+      "finalResult": "",
+      "note": "",
+      "timeline": [
+        {
+          "time": "2026-10-06 09:56",
+          "type": "信息报备",
+          "operator": "农彩凤",
+          "raw": "龙城·誉峰天境信息报备\n信息编码：NCF1002001-001\n信息来源：y（朋友）\n客户姓名：覃女士\n客户电话：\n客户微信：已私发\n客户意向：住宅\n报备人员：农彩凤\n报备时间：10-02-9：40",
+          "fields": {
+            "code": "NCF1002001-001",
+            "source": "y（朋友）",
+            "name": "覃女士",
+            "wechat": "已私发",
+            "intent": "住宅",
+            "reporter": "农彩凤",
+            "time": "10-02-9：40"
+          }
+        }
+      ],
+      "painPoints": []
     }
   ],
-  "seq": 16
+  "seq": 17
 }
