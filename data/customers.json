@@ -195,45 +195,6 @@
       "painPoints": []
     },
     {
-      "id": "C0004",
-      "name": "彭先生",
-      "phone": "1391921",
-      "wechat": "已私发",
-      "source": "Y（朋友）",
-      "profession": "",
-      "industry": "",
-      "intentProduct": "住宅",
-      "budget": "",
-      "tags": [],
-      "intentLevel": "",
-      "stage": "新线索",
-      "reporter": "黄秀红",
-      "firstReportAt": "2026-09-29 22:43",
-      "visitCount": 0,
-      "lastVisitAt": "",
-      "finalResult": "",
-      "note": "原报备电话“139龙城大卖1921”中“龙城大卖”为微信表情，电话中段被遮挡，暂存 1391921，待补全。",
-      "timeline": [
-        {
-          "time": "2026-09-28 11:28",
-          "type": "信息报备",
-          "operator": "黄秀红",
-          "raw": "",
-          "fields": {
-            "code": "HXH0928003-003",
-            "source": "Y（朋友）",
-            "name": "彭先生",
-            "phone": "1391921",
-            "wechat": "已私发",
-            "intent": "住宅",
-            "reporter": "黄秀红",
-            "time": "0928 -11:28"
-          }
-        }
-      ],
-      "painPoints": []
-    },
-    {
       "id": "C0005",
       "name": "黄姐",
       "phone": "",
