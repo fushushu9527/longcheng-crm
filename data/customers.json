@@ -966,7 +966,48 @@
           "status": "跟进中"
         }
       ]
+    },
+    {
+      "id": "C0026",
+      "name": "林女士",
+      "phone": "",
+      "wechat": "",
+      "source": "永旗地产赖仙娥",
+      "profession": "",
+      "industry": "",
+      "intentProduct": "",
+      "budget": "",
+      "tags": [
+        "女"
+      ],
+      "intentLevel": "",
+      "stage": "新线索",
+      "reporter": "农彩凤",
+      "firstReportAt": "2026-10-10 17:00",
+      "visitCount": 0,
+      "lastVisitAt": "",
+      "finalResult": "",
+      "note": "",
+      "timeline": [
+        {
+          "time": "2026-10-10 09:00",
+          "type": "信息报备",
+          "operator": "农彩凤",
+          "raw": "内部客户报备\n\n客户信息编码：NCF1010\n个人累计信息：005\n项目累计信息：0013\n客户信息来源：永旗地产赖仙娥\n客户姓名称呼：林女士\n客户大概画像：女\n客户联络方式：152龙城大卖8524\n信息报备时间：10月10日\n信息报备人员：农彩凤",
+          "fields": {
+            "code": "NCF1010",
+            "source": "永旗地产赖仙娥",
+            "name": "林女士",
+            "intent": "住宅",
+            "reporter": "农彩凤",
+            "time": "10月10日",
+            "personalSeq": "005",
+            "projectSeq": "0013"
+          }
+        }
+      ],
+      "painPoints": []
     }
   ],
-  "seq": 25
+  "seq": 26
 }
