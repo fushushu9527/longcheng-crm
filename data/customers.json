@@ -858,7 +858,48 @@
           "status": "跟进中"
         }
       ]
+    },
+    {
+      "id": "C0024",
+      "name": "李先生",
+      "phone": "",
+      "wechat": "",
+      "source": "阳光城念念推荐",
+      "profession": "",
+      "industry": "",
+      "intentProduct": "",
+      "budget": "",
+      "tags": [
+        "男"
+      ],
+      "intentLevel": "",
+      "stage": "新线索",
+      "reporter": "农彩凤",
+      "firstReportAt": "2026-10-10 16:58",
+      "visitCount": 0,
+      "lastVisitAt": "",
+      "finalResult": "",
+      "note": "",
+      "timeline": [
+        {
+          "time": "2026-10-09 09:00",
+          "type": "信息报备",
+          "operator": "农彩凤",
+          "raw": "内部客户报备\n\n客户信息编码：NCF1009\n个人累计信息：004\n项目累计信息：0012\n客户信息来源：阳光城念念推荐\n客户姓名称呼：李先生\n客户大概画像：男  \n客户联络方式：153龙城大卖4673\n信息报备时间：10月09日\n信息报备人员：农彩凤",
+          "fields": {
+            "code": "NCF1009",
+            "source": "阳光城念念推荐",
+            "name": "李先生",
+            "intent": "住宅",
+            "reporter": "农彩凤",
+            "time": "10月09日",
+            "personalSeq": "004",
+            "projectSeq": "0012"
+          }
+        }
+      ],
+      "painPoints": []
     }
   ],
-  "seq": 23
+  "seq": 24
 }
