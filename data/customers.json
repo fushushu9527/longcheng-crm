@@ -1270,7 +1270,219 @@
           "status": "跟进中"
         }
       ]
+    },
+    {
+      "id": "C0029",
+      "name": "张女士",
+      "phone": "",
+      "wechat": "",
+      "source": "永旗地产赖仙娥",
+      "profession": "",
+      "industry": "",
+      "intentProduct": "",
+      "budget": "",
+      "tags": [
+        "女"
+      ],
+      "intentLevel": "",
+      "stage": "新线索",
+      "reporter": "农彩凤",
+      "firstReportAt": "2026-10-11 20:25",
+      "visitCount": 0,
+      "lastVisitAt": "",
+      "finalResult": "",
+      "note": "",
+      "timeline": [
+        {
+          "time": "2026-10-11 09:00",
+          "type": "信息报备",
+          "operator": "农彩凤",
+          "raw": "内部客户报备\n\n客户信息编码：NCF1012\n个人累计信息：008\n项目累计信息：0017\n客户信息来源：永旗地产赖仙娥\n客户姓名称呼：张女士\n客户大概画像：女 \n客户联络方式：191龙城大卖8710\n信息报备时间：10月11日\n信息报备人员：农彩凤\n龙城·誉峰天境",
+          "fields": {
+            "code": "NCF1012",
+            "source": "永旗地产赖仙娥",
+            "name": "张女士",
+            "intent": "住宅",
+            "reporter": "农彩凤",
+            "time": "10月11日",
+            "personalSeq": "008",
+            "projectSeq": "0017"
+          }
+        }
+      ],
+      "painPoints": []
+    },
+    {
+      "id": "C0030",
+      "name": "成女士",
+      "phone": "",
+      "wechat": "",
+      "source": "永旗地产赖仙娥",
+      "profession": "",
+      "industry": "",
+      "intentProduct": "",
+      "budget": "",
+      "tags": [
+        "女",
+        "50左右"
+      ],
+      "intentLevel": "C",
+      "stage": "方案沟通",
+      "reporter": "农彩凤",
+      "firstReportAt": "2026-10-11 20:26",
+      "visitCount": 1,
+      "lastVisitAt": "2026-10-11 9：40",
+      "finalResult": "",
+      "note": "",
+      "timeline": [
+        {
+          "time": "2026-10-11 09:00",
+          "type": "信息报备",
+          "operator": "农彩凤",
+          "raw": "内部客户报备\n\n客户信息编码：NCF1013\n个人累计信息：007\n项目累计信息：0016\n客户信息来源：永旗地产赖仙娥\n客户姓名称呼：成女士\n客户大概画像：女  50左右\n客户联络方式：131龙城大卖1019\n信息报备时间：10月11日\n信息报备人员：农彩凤\n\n首次到访时间：10月11日 9：40\n首次接待人员：农彩凤\n客户接待时长：30分钟\n客户意向等级：C\n客户反馈意见：先看看，不着急买\n个人到访累计：6\n项目到访累计：11\n龙城·誉峰天境",
+          "fields": {
+            "code": "NCF1013",
+            "source": "永旗地产赖仙娥",
+            "name": "成女士",
+            "intent": "住宅",
+            "reporter": "农彩凤",
+            "time": "10月11日",
+            "personalSeq": "007",
+            "projectSeq": "0016"
+          }
+        },
+        {
+          "time": "2026-10-11 9：40",
+          "type": "首访报备",
+          "operator": "农彩凤",
+          "raw": "内部客户报备\n\n客户信息编码：NCF1013\n个人累计信息：007\n项目累计信息：0016\n客户信息来源：永旗地产赖仙娥\n客户姓名称呼：成女士\n客户大概画像：女  50左右\n客户联络方式：131龙城大卖1019\n信息报备时间：10月11日\n信息报备人员：农彩凤\n\n首次到访时间：10月11日 9：40\n首次接待人员：农彩凤\n客户接待时长：30分钟\n客户意向等级：C\n客户反馈意见：先看看，不着急买\n个人到访累计：6\n项目到访累计：11\n龙城·誉峰天境",
+          "fields": {
+            "code": "NCF1013",
+            "name": "成女士",
+            "time": "10月11日 9：40",
+            "receiver": "农彩凤",
+            "level": "C",
+            "profile": "女  50左右",
+            "duration": "30分钟",
+            "feedback": "先看看，不着急买"
+          }
+        }
+      ],
+      "painPoints": [
+        {
+          "time": "2026-10-11 9：40",
+          "point": "先看看，不着急买",
+          "solution": "",
+          "status": "跟进中"
+        }
+      ]
+    },
+    {
+      "id": "C0031",
+      "name": "张女士",
+      "phone": "",
+      "wechat": "",
+      "source": "永旗地产赖仙娥",
+      "profession": "",
+      "industry": "",
+      "intentProduct": "",
+      "budget": "",
+      "tags": [
+        "女",
+        "45左右"
+      ],
+      "intentLevel": "C",
+      "stage": "方案沟通",
+      "reporter": "农彩凤",
+      "firstReportAt": "2026-10-11 20:26",
+      "visitCount": 1,
+      "lastVisitAt": "2026-10-11 10：15",
+      "finalResult": "",
+      "note": "",
+      "timeline": [
+        {
+          "time": "2026-10-11 09:00",
+          "type": "信息报备",
+          "operator": "农彩凤",
+          "raw": "内部客户报备\n\n客户信息编码：NCF1014\n个人累计信息：008\n项目累计信息：0017\n客户信息来源：永旗地产赖仙娥\n客户姓名称呼：张女士\n客户大概画像：女 45左右\n客户联络方式：191龙城大卖8710\n信息报备时间：10月11日\n信息报备人员：农彩凤\n\n首次到访时间：10月11日 10：15\n首次接待人员：农彩凤\n客户接待时长：50分钟\n客户意向等级：C\n客户反馈意见：觉得房间小，想要大户型\n个人到访累计：7\n项目到访累计：12\n龙城·誉峰天境",
+          "fields": {
+            "code": "NCF1014",
+            "source": "永旗地产赖仙娥",
+            "name": "张女士",
+            "intent": "住宅",
+            "reporter": "农彩凤",
+            "time": "10月11日",
+            "personalSeq": "008",
+            "projectSeq": "0017"
+          }
+        },
+        {
+          "time": "2026-10-11 10：15",
+          "type": "首访报备",
+          "operator": "农彩凤",
+          "raw": "内部客户报备\n\n客户信息编码：NCF1014\n个人累计信息：008\n项目累计信息：0017\n客户信息来源：永旗地产赖仙娥\n客户姓名称呼：张女士\n客户大概画像：女 45左右\n客户联络方式：191龙城大卖8710\n信息报备时间：10月11日\n信息报备人员：农彩凤\n\n首次到访时间：10月11日 10：15\n首次接待人员：农彩凤\n客户接待时长：50分钟\n客户意向等级：C\n客户反馈意见：觉得房间小，想要大户型\n个人到访累计：7\n项目到访累计：12\n龙城·誉峰天境",
+          "fields": {
+            "code": "NCF1014",
+            "name": "张女士",
+            "time": "10月11日 10：15",
+            "receiver": "农彩凤",
+            "level": "C",
+            "profile": "女 45左右",
+            "duration": "50分钟",
+            "feedback": "觉得房间小，想要大户型"
+          }
+        }
+      ],
+      "painPoints": [
+        {
+          "time": "2026-10-11 10：15",
+          "point": "觉得房间小，想要大户型",
+          "solution": "",
+          "status": "跟进中"
+        }
+      ]
+    },
+    {
+      "id": "C0032",
+      "name": "隆女士",
+      "phone": "",
+      "wechat": "",
+      "source": "永旗地产赖仙娥",
+      "profession": "",
+      "industry": "",
+      "intentProduct": "",
+      "budget": "",
+      "tags": [
+        "女"
+      ],
+      "intentLevel": "",
+      "stage": "新线索",
+      "reporter": "农彩凤",
+      "firstReportAt": "2026-10-11 20:26",
+      "visitCount": 0,
+      "lastVisitAt": "",
+      "finalResult": "",
+      "note": "",
+      "timeline": [
+        {
+          "time": "2026-10-11 09:00",
+          "type": "信息报备",
+          "operator": "农彩凤",
+          "raw": "内部客户报备\n\n客户信息编码：NCF1015\n个人累计信息：009\n项目累计信息：0018\n客户信息来源：永旗地产赖仙娥\n客户姓名称呼：隆女士\n客户大概画像：女 \n客户联络方式：153龙城大卖1499\n信息报备时间：10月11日\n信息报备人员：农彩凤",
+          "fields": {
+            "code": "NCF1015",
+            "source": "永旗地产赖仙娥",
+            "name": "隆女士",
+            "intent": "住宅",
+            "reporter": "农彩凤",
+            "time": "10月11日",
+            "personalSeq": "009",
+            "projectSeq": "0018"
+          }
+        }
+      ],
+      "painPoints": []
     }
   ],
-  "seq": 28
+  "seq": 32
 }
