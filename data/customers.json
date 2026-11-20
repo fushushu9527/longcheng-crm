@@ -2115,7 +2115,48 @@
           "status": "跟进中"
         }
       ]
+    },
+    {
+      "id": "C0043",
+      "name": "黄先生",
+      "phone": "",
+      "wechat": "",
+      "source": "电话来访",
+      "profession": "",
+      "industry": "",
+      "intentProduct": "",
+      "budget": "",
+      "tags": [
+        "男"
+      ],
+      "intentLevel": "",
+      "stage": "新线索",
+      "reporter": "黄秀红",
+      "firstReportAt": "2026-11-20 19:22",
+      "visitCount": 0,
+      "lastVisitAt": "",
+      "finalResult": "",
+      "note": "",
+      "timeline": [
+        {
+          "time": "2026-11-05 09:00",
+          "type": "信息报备",
+          "operator": "黄秀红",
+          "raw": "内部客户报备\n\n客户信息编码：HXH1105\n个人累计信息：008\n项目累计信息：0031\n客户信息来源：电话来访\n客户姓名称呼：黄先生\n客户大概画像：男\n客户联络方式：187龙城大卖9825\n信息报备时间：11月5日\n信息报备人员：黄秀红\n",
+          "fields": {
+            "code": "HXH1105",
+            "source": "电话来访",
+            "name": "黄先生",
+            "intent": "住宅",
+            "reporter": "黄秀红",
+            "time": "11月5日",
+            "personalSeq": "008",
+            "projectSeq": "0031"
+          }
+        }
+      ],
+      "painPoints": []
     }
   ],
-  "seq": 42
+  "seq": 43
 }
